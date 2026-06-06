@@ -1,9 +1,5 @@
 # MTech-Research-Thesis-FRB-Bayesian-Inference
-Bayesian Inference Constraints on the Faint-End Slope of Fast Radio Burst Energy Distribution using HECATE Catalogue Data.
-
-# M.Tech Research Thesis
-
-## Bayesian Inference Constraints on the Faint-End Slope of Fast Radio Burst Energy Distribution
+## Bayesian Inference Constraints on the Faint-End Slope of Fast Radio Burst Energy Distribution using CHIME/FRB Catalog-1 & HECATE Catalog Data.
 
 ### Author
 
