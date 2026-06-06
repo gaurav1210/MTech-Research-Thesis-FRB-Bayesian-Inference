@@ -1,0 +1,339 @@
+=== Cell 0 Source ===
+pip install emcee
+=== Cell {i} Outputs ===
+Collecting emcee
+  Downloading emcee-3.1.6-py2.py3-none-any.whl.metadata (3.0 kB)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from emcee) (2.0.2)
+Downloading emcee-3.1.6-py2.py3-none-any.whl (47 kB)
+[?25l   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.0/47.4 kB[0m [31m?[0m eta [36m-:--:--[0m[2K   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m47.4/47.4 kB[0m [31m2.4 MB/s[0m eta [36m0:00:00[0m
+[?25hInstalling collected packages: emcee
+Successfully installed emcee-3.1.6
+
+
+==================================================
+
+=== Cell 2 Source ===
+pip install emcee corner
+=== Cell {i} Outputs ===
+Requirement already satisfied: emcee in /usr/local/lib/python3.12/dist-packages (3.1.6)
+Collecting corner
+  Downloading corner-2.2.3-py3-none-any.whl.metadata (2.2 kB)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from emcee) (2.0.2)
+Requirement already satisfied: matplotlib>=2.1 in /usr/local/lib/python3.12/dist-packages (from corner) (3.10.0)
+Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (1.3.3)
+Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (4.62.1)
+Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (1.5.0)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (26.0)
+Requirement already satisfied: pillow>=8 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (11.3.0)
+Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (3.3.2)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=2.1->corner) (2.9.0.post0)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.7->matplotlib>=2.1->corner) (1.17.0)
+Downloading corner-2.2.3-py3-none-any.whl (15 kB)
+Installing collected packages: corner
+Successfully installed corner-2.2.3
+
+
+==================================================
+
+=== Cell 57 Source ===
+# --- 5. Main Execution Block for MCMC ---                                   # Main script execution starts here
+
+if __name__ == '__main__':                                                   # Ensures code runs only when script is executed directly
+    args = parse_arguments()                                                 # Parse command-line arguments
+
+    os.makedirs(args.output_dir, exist_ok=True)                              # Create output directory if not exists
+=== Cell {i} Outputs ===
+Entered
+Parsed args: Namespace(catalog_path='/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/LVG_table.txt', output_dir='/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT', log_file='mcmc_run.log', nwalkers=20, nsteps=2000, nburnin=500, model_property_type='sfr', nthreads=8)
+
+
+==================================================
+
+=== Cell 58 Source ===
+    # --- Logging Setup ---
+    log_file_full_path = os.path.join(args.output_dir, args.log_file)        # Define full path for log file
+    setup_logging(log_file_full_path)                                        # Initialize logging system
+
+    logging.info("--- Starting Bayesian FRB Rate Modeling with emcee ---")   # Start message
+    logging.info(f"Command-line arguments: {args}")                          # Log input arguments
+=== Cell {i} Outputs ===
+INFO: Logging configured. Output will be saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/mcmc_run.log'
+INFO: --- Starting Bayesian FRB Rate Modeling with emcee ---
+INFO: Command-line arguments: Namespace(catalog_path='/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/LVG_table.txt', output_dir='/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT', log_file='mcmc_run.log', nwalkers=20, nsteps=2000, nburnin=500, model_property_type='sfr', nthreads=8)
+
+
+==================================================
+
+=== Cell 61 Source ===
+# --- MCMC Setup ---
+MODEL_PROPERTY_TYPE = args.model_property_type                           # Choose model scaling type
+ndim = 5                                                                 # Number of parameters
+nwalkers = args.nwalkers                                                 # Number of walkers
+n_burn_in = args.nburnin                                                 # Burn-in steps
+n_steps = args.nsteps                                                    # Production steps
+nthreads = args.nthreads                                                 # Number of CPU threads
+
+p0 = np.zeros((nwalkers, ndim))                                          # Initialize walker positions
+param_keys = list(PRIOR_BOUNDS.keys())                                   # Parameter names
+
+logging.info("\nInitializing walkers with robust checks (sampling uniformly across priors)...")
+
+for i in range(nwalkers):
+    attempt = 0
+
+    while True:
+
+        candidate_p = np.array([
+            np.random.uniform(PRIOR_BOUNDS['log10_R_all_sky'][0], PRIOR_BOUNDS['log10_R_all_sky'][1]),
+            np.random.uniform(PRIOR_BOUNDS['log10_E_min_pop'][0], PRIOR_BOUNDS['log10_E_min_pop'][1]),
+            np.random.uniform(PRIOR_BOUNDS['gamma'][0], PRIOR_BOUNDS['gamma'][1]),
+            np.random.uniform(PRIOR_BOUNDS['log10_E_star'][0], PRIOR_BOUNDS['log10_E_star'][1]),
+            np.random.uniform(PRIOR_BOUNDS['alpha'][0], PRIOR_BOUNDS['alpha'][1])
+        ])
+
+        # Physical constraint
+        if candidate_p[3] <= candidate_p[1]:
+            continue
+
+        # ONLY CHECK PRIOR HERE (IMPORTANT FIX)
+        test_lp = log_prior(tuple(candidate_p))
+
+        if np.isfinite(test_lp):
+            p0[i] = candidate_p
+            break
+
+        attempt += 1
+
+        if attempt > 5000:
+            raise RuntimeError(f"Walker {i} failed to initialize")
+
+
+            logging.critical(f"Could not find a valid initial point for walker {i} after {attempt} attempts.")
+            sys.exit(1)
+
+logging.info(f"\nSuccessfully initialized {nwalkers} walkers with valid starting points.")
+
+logging.info(f"\nInitializing emcee sampler with {nwalkers} walkers and {ndim} dimensions.")
+logging.info(f"Model property type: '{MODEL_PROPERTY_TYPE}'")
+logging.info(f"Burn-in steps: {n_burn_in}, Production steps: {n_steps}")
+logging.info(f"Number of threads for multiprocessing: {nthreads}")
+
+=== Cell {i} Outputs ===
+INFO: 
+Initializing walkers with robust checks (sampling uniformly across priors)...
+INFO: 
+Successfully initialized 20 walkers with valid starting points.
+INFO: 
+Initializing emcee sampler with 20 walkers and 5 dimensions.
+INFO: Model property type: 'sfr'
+INFO: Burn-in steps: 500, Production steps: 2000
+INFO: Number of threads for multiprocessing: 8
+
+
+==================================================
+
+=== Cell 62 Source ===
+    # Use multiprocessing pool if nthreads > 1
+    if nthreads > 8:
+        with multiprocessing.Pool(nthreads) as pool:
+            sampler = emcee.EnsembleSampler(
+                nwalkers, ndim, log_posterior,
+                args=(observed_all_sky_data, obs_galaxy_data_for_likelihood, MODEL_PROPERTY_TYPE),
+                pool=pool
+            )
+
+            logging.info(f"Running {n_burn_in} burn-in steps...")
+            state = sampler.run_mcmc(p0, n_burn_in, progress=True)
+            sampler.reset()
+
+            logging.info(f"Running {n_steps} production steps...")
+            sampler.run_mcmc(state, n_steps, progress=True)
+    else: # Run without multiprocessing
+        sampler = emcee.EnsembleSampler(
+            nwalkers, ndim, log_posterior,
+            args=(observed_all_sky_data, obs_galaxy_data_for_likelihood, MODEL_PROPERTY_TYPE)
+        )
+
+        logging.info(f"Running {n_burn_in} burn-in steps...")
+        state = sampler.run_mcmc(p0, n_burn_in, progress=True)
+        sampler.reset()
+
+        logging.info(f"Running {n_steps} production steps...")
+        sampler.run_mcmc(state, n_steps, progress=True)
+
+
+    full_chain = sampler.get_chain()
+    full_log_probs = sampler.get_log_prob()
+
+    # Save outputs to the specified output directory
+    full_chain_filename = os.path.join(args.output_dir, f"mcmc_full_chain_{MODEL_PROPERTY_TYPE}.npy")
+    full_log_probs_filename = os.path.join(args.output_dir, f"mcmc_full_log_probs_{MODEL_PROPERTY_TYPE}.npy")
+    np.save(full_chain_filename, full_chain)
+    np.save(full_log_probs_filename, full_log_probs)
+    logging.info(f"\nFull MCMC chain saved to '{full_chain_filename}'")
+    logging.info(f"Full MCMC log-probabilities saved to '{full_log_probs_filename}'")
+
+    logging.info("\nMCMC run complete.")
+
+    flat_samples = sampler.get_chain(flat=True)
+    log_probs_flat = sampler.get_log_prob(flat=True)
+
+    logging.info(f"Shape of flattened chain: {flat_samples.shape}")
+    logging.info(f"Shape of flattened log probabilities: {log_probs_flat.shape}")
+
+    param_names_for_print = list(PRIOR_BOUNDS.keys())
+    logging.info("\n--- MCMC Results Summary (Mean and Std Dev of parameters) ---")
+    for i, name in enumerate(param_names_for_print):
+        mean_val = np.mean(flat_samples[:, i])
+        std_val = np.std(flat_samples[:, i])
+        logging.info(f"{name}: {mean_val:.4f} +/- {std_val:.4f}")
+
+    output_filename = os.path.join(args.output_dir, f"mcmc_chain_results_{MODEL_PROPERTY_TYPE}.npy")
+    np.save(output_filename, flat_samples)
+    logging.info(f"\nMCMC chain (flattened) saved to '{output_filename}'")
+
+    output_log_probs_filename = os.path.join(args.output_dir, f"mcmc_log_probs_{MODEL_PROPERTY_TYPE}.npy")
+    np.save(output_log_probs_filename, log_probs_flat)
+    logging.info(f"MCMC log-probabilities (flattened) saved to '{output_log_probs_filename}'")
+
+
+    # --- START OF VISUALIZATION CODE ---
+    logging.info("\nGenerating corner plot...")
+    corner_plot_labels = [
+        r"$\log_{10}(R_{\rm all\,sky})$",
+        r"$\log_{10}(E_{\min})$",
+        r"$\gamma$",
+        r"$\log_{10}(E_\star)$",
+        r"$\alpha$"
+    ]
+
+    fig_corner = corner.corner(
+        flat_samples,
+        labels=corner_plot_labels,
+        quantiles=[0.16, 0.5, 0.84],
+        show_titles=True,
+        title_fmt=".2f",
+        verbose=False,
+        hist_kwargs={"density": True},
+        plot_datapoints=False,
+        fill_contours=True,
+        cmap="viridis",
+    )
+
+    corner_plot_filename = os.path.join(args.output_dir, f"corner_plot_{MODEL_PROPERTY_TYPE}.png")
+    plt.savefig(corner_plot_filename, dpi=200, bbox_inches='tight')
+    logging.info(f"Corner plot saved to '{corner_plot_filename}'")
+    plt.close(fig_corner)
+
+    logging.info("\n--- MCMC Results Summary (Median and 68% Credible Intervals) ---")
+    for i, name in enumerate(param_names_for_print):
+        mcmc_quantiles = np.percentile(flat_samples[:, i], [16, 50, 84])
+        lower_err = mcmc_quantiles[1] - mcmc_quantiles[0]
+        upper_err = mcmc_quantiles[2] - mcmc_quantiles[1]
+        txt = f"{name}: ${mcmc_quantiles[1]:.3f}^{{+{upper_err:.3f}}}_{{-{lower_err:.3f}}}$"
+        logging.info(txt)
+
+    logging.info("\nGenerating trace plots...")
+    fig_trace, axes_trace = plt.subplots(ndim + 1, figsize=(10, 2.5 * (ndim + 1)), sharex=True)
+
+    for i in range(ndim):
+        ax = axes_trace[i]
+        ax.plot(full_chain[:, :, i], "k", alpha=0.3)
+        ax.set_ylabel(corner_plot_labels[i])
+        ax.yaxis.set_label_coords(-0.1, 0.5)
+
+    ax_log_prob = axes_trace[ndim]
+    ax_log_prob.plot(full_log_probs, "k", alpha=0.3)
+    ax_log_prob.set_ylabel(r"$\ln P$")
+    ax_log_prob.yaxis.set_label_coords(-0.1, 0.5)
+
+    axes_trace[-1].set_xlabel("Steps")
+    fig_trace.tight_layout()
+
+    trace_plot_filename = os.path.join(args.output_dir, f"trace_plots_{MODEL_PROPERTY_TYPE}.png")
+    plt.savefig(trace_plot_filename, dpi=200, bbox_inches='tight')
+    logging.info(f"Trace plots saved to '{trace_plot_filename}'")
+    plt.close(fig_trace)
+
+    try:
+        tau = sampler.get_autocorr_time()
+        logging.info(f"\nAutocorrelation times (tau) per parameter: {tau}")
+        effective_samples_est = len(flat_samples) / np.max(tau)
+        logging.info(f"Estimated effective number of independent samples: {effective_samples_est:.0f}")
+    except emcee.autocorr.AutocorrError as e:
+        logging.warning(f"\nCould not estimate autocorrelation time: {e}")
+        logging.warning("This might happen if the chain is too short or not well-converged.")
+
+    logging.info("\nAll visualization and diagnostic plots have been generated.")
+    logging.info(f"Check the directory '{args.output_dir}' for the output files, including '{args.log_file}'.")
+    logging.info("\n--- MCMC Script Finished Successfully ---")
+=== Cell {i} Outputs ===
+INFO: Running 500 burn-in steps...
+
+/tmp/ipykernel_10113/1131592489.py:100: DeprecationWarning: `trapz` is deprecated. Use `trapezoid` instead, or one of the numerical integration functions in `scipy.integrate`.
+  integral_result = np.trapz(Y_values, X_values)
+  0%|          | 0/500 [00:00<?, ?it/s]/usr/local/lib/python3.12/dist-packages/emcee/moves/red_blue.py:99: RuntimeWarning: invalid value encountered in scalar subtract
+  lnpdiff = f + nlp - state.log_prob[j]
+100%|██████████| 500/500 [33:07<00:00,  3.98s/it]
+INFO: Running 2000 production steps...
+
+
+100%|██████████| 2000/2000 [2:16:41<00:00,  4.10s/it]
+INFO: 
+Full MCMC chain saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/mcmc_full_chain_sfr.npy'
+INFO: Full MCMC log-probabilities saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/mcmc_full_log_probs_sfr.npy'
+INFO: 
+MCMC run complete.
+INFO: Shape of flattened chain: (40000, 5)
+INFO: Shape of flattened log probabilities: (40000,)
+INFO: 
+--- MCMC Results Summary (Mean and Std Dev of parameters) ---
+INFO: log10_R_all_sky: 5.2610 +/- 0.3373
+INFO: log10_E_min_pop: 33.8980 +/- 2.2009
+INFO: gamma: 1.2579 +/- 0.8039
+INFO: log10_E_star: 41.6401 +/- 0.6852
+INFO: alpha: -1.2273 +/- 1.3366
+INFO: 
+MCMC chain (flattened) saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/mcmc_chain_results_sfr.npy'
+INFO: MCMC log-probabilities (flattened) saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/mcmc_log_probs_sfr.npy'
+INFO: 
+Generating corner plot...
+
+
+
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+WARNING: Too few points to create valid contours
+INFO: Corner plot saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/corner_plot_sfr.png'
+INFO: 
+--- MCMC Results Summary (Median and 68% Credible Intervals) ---
+INFO: log10_R_all_sky: $5.278^{+0.287}_{-0.331}$
+INFO: log10_E_min_pop: $33.643^{+2.950}_{-1.596}$
+INFO: gamma: $1.297^{+0.740}_{-0.922}$
+INFO: log10_E_star: $41.585^{+0.956}_{-0.709}$
+INFO: alpha: $-1.683^{+2.248}_{-0.853}$
+INFO: 
+Generating trace plots...
+INFO: Trace plots saved to '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT/trace_plots_sfr.png'
+INFO: 
+Autocorrelation times (tau) per parameter: [nan nan nan nan nan]
+INFO: Estimated effective number of independent samples: nan
+INFO: 
+All visualization and diagnostic plots have been generated.
+INFO: Check the directory '/content/drive/MyDrive/MTHECH_THESIS/Mohit_Sir/DATASET/RESULT' for the output files, including 'mcmc_run.log'.
+INFO: 
+--- MCMC Script Finished Successfully ---
+
+/usr/local/lib/python3.12/dist-packages/emcee/autocorr.py:38: RuntimeWarning: invalid value encountered in divide
+  acf /= acf[0]
+
+
+==================================================
