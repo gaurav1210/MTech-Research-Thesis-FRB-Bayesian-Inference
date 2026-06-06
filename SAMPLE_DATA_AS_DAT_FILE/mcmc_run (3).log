@@ -1,0 +1,75 @@
+2026-05-15 01:51:46,569 - INFO - Logging configured. Output will be saved to 'RESULT_SM_5param40_3000_200\mcmc_run.log'
+2026-05-15 01:51:46,570 - INFO - --- Starting Bayesian FRB Rate Modeling with emcee ---
+2026-05-15 01:51:46,570 - INFO - Command-line arguments: Namespace(catalog_path='LVG495.txt', output_dir='RESULT_SM_5param40_3000_200', log_file='mcmc_run.log', nwalkers=40, nsteps=3000, nburnin=200, model_property_type='stellar_mass', nthreads=1)
+2026-05-15 01:51:46,571 - INFO - CHIME Observed Rate: 1.918e+05 bursts / yr
+2026-05-15 01:51:46,572 - INFO - Attempting to load galaxy catalog from 'LVG495.txt'...
+2026-05-15 01:51:46,579 - INFO - Successfully loaded catalog with 495 galaxies.
+2026-05-15 01:51:46,579 - INFO - Renamed columns:
+2026-05-15 01:51:46,580 - INFO -   'Galaxy name' -> 'galaxy_name'
+2026-05-15 01:51:46,581 - INFO -   'RAJ2000 (deg)' -> 'ra_deg'
+2026-05-15 01:51:46,581 - INFO -   'DEJ2000 (deg)' -> 'dec_deg'
+2026-05-15 01:51:46,581 - INFO -   'D25 semi-major axis (arcmin)' -> 'd25_semi_major_arcmin'
+2026-05-15 01:51:46,582 - INFO -   'D25 semi-minor axis (arcmin)' -> 'd25_semi_minor_arcmin'
+2026-05-15 01:51:46,582 - INFO -   'D25 positional angle, North-to-Northeast (deg)' -> 'd25_pos_angle_deg'
+2026-05-15 01:51:46,583 - INFO -   'Inclination angle (deg)' -> 'inclination_angle_deg'
+2026-05-15 01:51:46,583 - INFO -   'Luminosity distance (Mpc)' -> 'luminosity_distance_mpc'
+2026-05-15 01:51:46,584 - INFO -   'logSFR_HEC' -> 'log_sfr_hec'
+2026-05-15 01:51:46,584 - INFO -   'logM_HEC' -> 'log10_stellar_mass_hec'
+2026-05-15 01:51:46,586 - INFO -   'mean_exposure_Hr' -> 'total_observation_time_hr'
+2026-05-15 01:51:46,595 - INFO - Prepared 495 galaxies
+2026-05-15 01:51:46,595 - INFO - Initializing walkers...
+2026-05-15 01:55:08,197 - INFO - Attempting to load galaxy catalog from 'LVG495.txt'...
+2026-05-15 01:55:08,206 - INFO - Successfully loaded catalog with 495 galaxies.
+2026-05-15 01:55:08,206 - INFO - Renamed columns:
+2026-05-15 01:55:08,207 - INFO -   'Galaxy name' -> 'galaxy_name'
+2026-05-15 01:55:08,207 - INFO -   'RAJ2000 (deg)' -> 'ra_deg'
+2026-05-15 01:55:08,208 - INFO -   'DEJ2000 (deg)' -> 'dec_deg'
+2026-05-15 01:55:08,208 - INFO -   'D25 semi-major axis (arcmin)' -> 'd25_semi_major_arcmin'
+2026-05-15 01:55:08,209 - INFO -   'D25 semi-minor axis (arcmin)' -> 'd25_semi_minor_arcmin'
+2026-05-15 01:55:08,209 - INFO -   'D25 positional angle, North-to-Northeast (deg)' -> 'd25_pos_angle_deg'
+2026-05-15 01:55:08,210 - INFO -   'Inclination angle (deg)' -> 'inclination_angle_deg'
+2026-05-15 01:55:08,210 - INFO -   'Luminosity distance (Mpc)' -> 'luminosity_distance_mpc'
+2026-05-15 01:55:08,211 - INFO -   'logSFR_HEC' -> 'log_sfr_hec'
+2026-05-15 01:55:08,211 - INFO -   'logM_HEC' -> 'log10_stellar_mass_hec'
+2026-05-15 01:55:08,212 - INFO -   'mean_exposure_Hr' -> 'total_observation_time_hr'
+2026-05-15 01:55:18,044 - INFO - Logging configured. Output will be saved to 'RESULT_SM_5param40_3000_200\mcmc_run.log'
+2026-05-15 01:55:18,045 - INFO - --- Starting Bayesian FRB Rate Modeling with emcee ---
+2026-05-15 01:55:18,045 - INFO - Command-line arguments: Namespace(catalog_path='LVG495.txt', output_dir='RESULT_SM_5param40_3000_200', log_file='mcmc_run.log', nwalkers=40, nsteps=3000, nburnin=200, model_property_type='stellar_mass', nthreads=1)
+2026-05-15 01:55:18,046 - INFO - CHIME Observed Rate: 1.918e+05 bursts / yr
+2026-05-15 01:55:18,047 - INFO - Attempting to load galaxy catalog from 'LVG495.txt'...
+2026-05-15 01:55:18,057 - INFO - Successfully loaded catalog with 495 galaxies.
+2026-05-15 01:55:18,057 - INFO - Renamed columns:
+2026-05-15 01:55:18,058 - INFO -   'Galaxy name' -> 'galaxy_name'
+2026-05-15 01:55:18,059 - INFO -   'RAJ2000 (deg)' -> 'ra_deg'
+2026-05-15 01:55:18,059 - INFO -   'DEJ2000 (deg)' -> 'dec_deg'
+2026-05-15 01:55:18,060 - INFO -   'D25 semi-major axis (arcmin)' -> 'd25_semi_major_arcmin'
+2026-05-15 01:55:18,060 - INFO -   'D25 semi-minor axis (arcmin)' -> 'd25_semi_minor_arcmin'
+2026-05-15 01:55:18,061 - INFO -   'D25 positional angle, North-to-Northeast (deg)' -> 'd25_pos_angle_deg'
+2026-05-15 01:55:18,062 - INFO -   'Inclination angle (deg)' -> 'inclination_angle_deg'
+2026-05-15 01:55:18,062 - INFO -   'Luminosity distance (Mpc)' -> 'luminosity_distance_mpc'
+2026-05-15 01:55:18,063 - INFO -   'logSFR_HEC' -> 'log_sfr_hec'
+2026-05-15 01:55:18,064 - INFO -   'logM_HEC' -> 'log10_stellar_mass_hec'
+2026-05-15 01:55:18,065 - INFO -   'mean_exposure_Hr' -> 'total_observation_time_hr'
+2026-05-15 01:55:18,187 - INFO - Prepared 495 galaxies
+2026-05-15 01:55:18,188 - INFO - Initializing walkers...
+2026-05-15 01:55:18,195 - INFO - Initialized 40 walkers
+2026-05-15 01:55:18,196 - INFO - Running burn-in...
+2026-05-15 06:50:54,371 - INFO - Running production...
+2026-05-20 10:58:41,475 - INFO - Attempting to load galaxy catalog from 'LVG495.txt'...
+2026-05-20 10:58:41,575 - INFO - Successfully loaded catalog with 495 galaxies.
+2026-05-20 10:58:41,575 - INFO - Renamed columns:
+2026-05-20 10:58:41,576 - INFO -   'Galaxy name' -> 'galaxy_name'
+2026-05-20 10:58:41,577 - INFO -   'RAJ2000 (deg)' -> 'ra_deg'
+2026-05-20 10:58:41,577 - INFO -   'DEJ2000 (deg)' -> 'dec_deg'
+2026-05-20 10:58:41,578 - INFO -   'D25 semi-major axis (arcmin)' -> 'd25_semi_major_arcmin'
+2026-05-20 10:58:41,578 - INFO -   'D25 semi-minor axis (arcmin)' -> 'd25_semi_minor_arcmin'
+2026-05-20 10:58:41,579 - INFO -   'D25 positional angle, North-to-Northeast (deg)' -> 'd25_pos_angle_deg'
+2026-05-20 10:58:41,579 - INFO -   'Inclination angle (deg)' -> 'inclination_angle_deg'
+2026-05-20 10:58:41,580 - INFO -   'Luminosity distance (Mpc)' -> 'luminosity_distance_mpc'
+2026-05-20 10:58:41,580 - INFO -   'logSFR_HEC' -> 'log_sfr_hec'
+2026-05-20 10:58:41,580 - INFO -   'logM_HEC' -> 'log10_stellar_mass_hec'
+2026-05-20 10:58:41,582 - INFO -   'mean_exposure_Hr' -> 'total_observation_time_hr'
+2026-05-20 11:06:39,900 - WARNING - AstropyDeprecationWarning: divisions involving a unit and a 'str' instance are deprecated since v7.1. Convert 'stellar_mass' to a unit explicitly.
+2026-05-20 11:10:09,075 - WARNING - The chain is shorter than 50 times the integrated autocorrelation time for 4 parameter(s). Use this estimate with caution and run a longer chain!
+N/50 = 1;
+tau: [0.74589532 0.63391939 0.79144318 0.77444289]
